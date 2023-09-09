@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Alert } from "./Alert";
 
 export const Register = () => {
   const [user, setUser] = useState({
@@ -44,7 +45,7 @@ export const Register = () => {
   return (
     <>
       <div>
-        {error && <p>{error}</p>}
+        {error && <Alert message={error} />}
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Correo Electronico: </label>
           <input

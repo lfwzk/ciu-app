@@ -13,7 +13,7 @@ export const Home = () => {
   return (
     <>
       <div>
-        <p>Hello {user.email} </p>
+        <p>Hello {user.displayName || user.email} </p>
         <button onClick={handleLogout}>Cerrar sesión</button>
       </div>
     </>
