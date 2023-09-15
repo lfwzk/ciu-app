@@ -6,6 +6,7 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 
@@ -24,12 +25,13 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Estado de usuario global, inicialmente nulo
   const [loading, setLoading] = useState(true); // Estado de carga global, inicialmente verdadero
 
-  const signup = async (email, password) => {
+  const signup = async (email, password, name) => {
     //console.log(email, password, repeatpassword);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
+        name,
         password
       );
       // Puedes realizar acciones adicionales aquí si es necesario, como almacenar datos de usuario en el estado global.
@@ -55,6 +57,9 @@ export const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, googleprovider);
   };
 
+  const resetPassword = (email) => {
+    return sendPasswordResetEmail(auth, email);
+  };
   useEffect(() => {
     const unsuscribed = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -69,7 +74,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <authContext.Provider
-      value={{ signup, login, user, logout, loading, loginWithGoogle }}
+      value={{
+        signup,
+        login,
+        user,
+        logout,
+        loading,
+        loginWithGoogle,
+        resetPassword,
+      }}
     >
       {children}
     </authContext.Provider>
