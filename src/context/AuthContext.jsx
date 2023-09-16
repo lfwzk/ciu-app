@@ -8,7 +8,9 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../firebase/firebase.config";
+import { auth, db } from "../firebase/firebase.config";
+import { doc, setDoc } from "firebase/firestore";
+import defaultProfilePhoto from "../assets/defaultprofile.jpg";
 
 export const authContext = createContext();
 
@@ -24,20 +26,53 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Estado de usuario global, inicialmente nulo
   const [loading, setLoading] = useState(true); // Estado de carga global, inicialmente verdadero
+  const defaultPhotoURL = defaultProfilePhoto;
 
-  const signup = async (email, password, name) => {
-    //console.log(email, password, repeatpassword);
+  const signup = async (email, password, displayName, isGoogleSignup) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        name,
-        password
-      );
-      // Puedes realizar acciones adicionales aquí si es necesario, como almacenar datos de usuario en el estado global.
-      return userCredential.user; // Devuelve el objeto de usuario si el registro es exitoso
+      let userCredential;
+
+      if (isGoogleSignup) {
+        // Registrar con Google
+        const googleProvider = new GoogleAuthProvider();
+        userCredential = await signInWithPopup(auth, googleProvider);
+        console.log("Usuario de Google registrado:", userCredential.user);
+      } else {
+        // Registrar con correo electrónico y contraseña
+        userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        console.log(
+          "Usuario con correo y contraseña registrado:",
+          userCredential.user
+        );
+      }
+
+      // Obtener el ID de usuario
+      const userId = userCredential.user.uid;
+
+      // Crear un documento en Firestore para el usuario registrado
+      const userDocRef = doc(db, "users", userId);
+
+      // Definir los datos que deseas almacenar en Firestore
+      const userData = {
+        name: displayName,
+        email: email,
+        photoURL: defaultPhotoURL,
+      };
+
+      // Almacenar los datos en Firestore
+      await setDoc(userDocRef, userData);
+
+      console.log("Datos de usuario almacenados en Firestore con ID:", userId);
+
+      // Devuelve el usuario registrado
+      return userCredential.user;
     } catch (error) {
-      throw error; // Propaga el error para que los componentes puedan manejarlo
+      console.error("Error al registrar usuario:", error);
+      throw error;
     }
   };
 

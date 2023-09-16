@@ -18,6 +18,7 @@ function App() {
           }
         />
         <Route path="*" element={<h1>Not Found</h1>} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

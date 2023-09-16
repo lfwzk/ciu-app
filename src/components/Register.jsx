@@ -7,10 +7,10 @@ export const Register = () => {
   const [user, setUser] = useState({
     email: "",
     password: "",
+    name: "",
   });
 
-  const { signup } = useAuth();
-  const { loginWithGoogle } = useAuth();
+  const { signup, loginWithGoogle } = useAuth();
 
   const navigate = useNavigate();
   const [error, setError] = useState(null);
@@ -27,7 +27,17 @@ export const Register = () => {
     e.preventDefault();
     setError("");
     try {
-      await signup(user.email, user.password);
+      // Verifica si se debe registrar con Google o correo y contraseña
+      if (user.email && user.password) {
+        // Registro con correo y contraseña
+        await signup(user.email, user.password, user.name, false);
+      } else {
+        // Registro con Google
+
+        await loginWithGoogle();
+        navigate("/");
+      }
+
       navigate("/");
     } catch (error) {
       // console.error("Error de Firebase:", error);
@@ -43,10 +53,6 @@ export const Register = () => {
       }
     }
   };
-  const handleGoogleSignin = async () => {
-    await loginWithGoogle();
-    navigate("/");
-  };
 
   return (
     <>
@@ -59,6 +65,16 @@ export const Register = () => {
               </h1>
               {error && <Alert message={error} />}
               <form onSubmit={handleSubmit}>
+                <div className="mb-4 lg:mb-7">
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Nombre"
+                    onChange={handleCange}
+                    className="w-full px-4 py-4 bg-white rounded-lg lg:py-5 dark:text-gray-300 dark:bg-gray-700 "
+                  />
+                </div>
+
                 <div className="mb-4 lg:mb-7">
                   <input
                     type="email"
@@ -92,7 +108,7 @@ export const Register = () => {
                 </div>
 
                 <button
-                  onClick={handleGoogleSignin}
+                  onClick={handleSubmit}
                   className=" w-full px-4 py-4 text-sm font-bold flex items-center justify-center  bg-red-700 rounded-md dark:bg-red-700 hover:bg-red-500 dark:hover:bg-gray-800"
                 >
                   <span className="inline-block mr-2 text-gray-300 dark:text-gray-400">
