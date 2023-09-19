@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
         email: email,
         photoURL: defaultPhotoURL,
       };
-
+      userData.role = "estudiante";
       // Almacenar los datos en Firestore
       await setDoc(userDocRef, userData);
 
@@ -87,6 +87,7 @@ export const AuthProvider = ({ children }) => {
           name: userCredential.user.displayName,
           email: userCredential.user.email,
           photoURL: userCredential.user.photoURL || defaultPhotoURL,
+          role: "estudiante",
         };
 
         // Almacenar los datos en Firestore
@@ -127,6 +128,16 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = (email) => {
     return sendPasswordResetEmail(auth, email);
   };
+
+  const assignUserRole = async (userID, role) => {
+    try {
+      await setDoc(doc(db, "users", userID), { role }, { merge: true });
+      console.log(`Rol "${role}" asignado al usuario con ID ${userID}`);
+    } catch (error) {
+      console.error("Error al asignar rol:", error);
+    }
+  };
+
   useEffect(() => {
     const unsuscribed = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -150,6 +161,7 @@ export const AuthProvider = ({ children }) => {
         loginWithGoogle,
         resetPassword,
         signupWithGoogle,
+        assignUserRole,
       }}
     >
       {children}
