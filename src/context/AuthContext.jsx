@@ -9,7 +9,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth, db } from "../firebase/firebase.config";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import defaultProfilePhoto from "../assets/defaultprofile.jpg";
 
 export const authContext = createContext();
@@ -28,27 +28,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true); // Estado de carga global, inicialmente verdadero
   const defaultPhotoURL = defaultProfilePhoto;
 
-  const signup = async (email, password, displayName, isGoogleSignup) => {
+  const signup = async (email, password, displayName) => {
     try {
-      let userCredential;
-
-      if (isGoogleSignup) {
-        // Registrar con Google
-        const googleProvider = new GoogleAuthProvider();
-        userCredential = await signInWithPopup(auth, googleProvider);
-        console.log("Usuario de Google registrado:", userCredential.user);
-      } else {
-        // Registrar con correo electrónico y contraseña
-        userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        console.log(
-          "Usuario con correo y contraseña registrado:",
-          userCredential.user
-        );
-      }
+      // Registrar con correo electrónico y contraseña
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(
+        "Usuario con correo y contraseña registrado:",
+        userCredential.user
+      );
 
       // Obtener el ID de usuario
       const userId = userCredential.user.uid;
@@ -72,6 +63,47 @@ export const AuthProvider = ({ children }) => {
       return userCredential.user;
     } catch (error) {
       console.error("Error al registrar usuario:", error);
+      throw error;
+    }
+  };
+
+  const signupWithGoogle = async () => {
+    try {
+      // Crear una instancia del proveedor de autenticación de Google
+      const googleProvider = new GoogleAuthProvider();
+
+      // Iniciar el proceso de autenticación con Google
+      const userCredential = await signInWithPopup(auth, googleProvider);
+
+      // Comprobar si el usuario ya existe en Firestore
+      const userId = userCredential.user.uid;
+      const userDocRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userDocRef);
+
+      // Si el usuario no existe en Firestore, crea un nuevo documento
+      if (!userDoc.exists()) {
+        // Definir los datos que deseas almacenar en Firestore
+        const userData = {
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          photoURL: userCredential.user.photoURL || defaultPhotoURL,
+        };
+
+        // Almacenar los datos en Firestore
+        await setDoc(userDocRef, userData);
+
+        console.log(
+          "Datos de usuario almacenados en Firestore con ID:",
+          userId
+        );
+      }
+
+      console.log("Usuario de Google registrado:", userCredential.user);
+
+      // Devuelve el usuario registrado
+      return userCredential.user;
+    } catch (error) {
+      console.error("Error al registrar usuario con Google:", error);
       throw error;
     }
   };
@@ -117,6 +149,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         loginWithGoogle,
         resetPassword,
+        signupWithGoogle,
       }}
     >
       {children}

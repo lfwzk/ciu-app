@@ -10,13 +10,13 @@ export const Register = () => {
     name: "",
   });
 
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup, signupWithGoogle } = useAuth();
 
   const navigate = useNavigate();
   const [error, setError] = useState(null);
 
   //ver estado de user
-  const handleCange = ({ target: { name, value } }) => {
+  const handleChange = ({ target: { name, value } }) => {
     setUser({
       ...user,
       [name]: value,
@@ -34,7 +34,7 @@ export const Register = () => {
       } else {
         // Registro con Google
 
-        await loginWithGoogle();
+        await signupWithGoogle();
         navigate("/");
       }
 
@@ -70,7 +70,7 @@ export const Register = () => {
                     type="text"
                     name="name"
                     placeholder="Nombre"
-                    onChange={handleCange}
+                    onChange={handleChange}
                     className="w-full px-4 py-4 bg-white rounded-lg lg:py-5 dark:text-gray-300 dark:bg-gray-700 "
                   />
                 </div>
@@ -80,7 +80,7 @@ export const Register = () => {
                     type="email"
                     name="email"
                     placeholder="correo electronico"
-                    onChange={handleCange}
+                    onChange={handleChange}
                     className="w-full px-4 py-4 bg-white rounded-lg lg:py-5 dark:text-gray-300 dark:bg-gray-700 "
                   />
                 </div>
@@ -90,7 +90,7 @@ export const Register = () => {
                     type="password"
                     name="password"
                     placeholder="contraseña"
-                    onChange={handleCange}
+                    onChange={handleChange}
                     className="w-full px-4 py-4 bg-white rounded-lg lg:py-5 dark:text-gray-300 dark:bg-gray-700 "
                   ></input>
                 </div>
