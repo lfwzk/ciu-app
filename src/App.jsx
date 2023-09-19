@@ -4,24 +4,29 @@ import { Login } from "./components/Login";
 import { Register } from "./components/Register";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoutes } from "./components/ProtectedRoutes";
+import { Dashboardview } from "./views/Dashboardview";
+import { CourseProvider } from "./context/CourseContext";
 
 function App() {
   return (
     <AuthProvider>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoutes>
-              <Home />
-            </ProtectedRoutes>
-          }
-        />
-        <Route path="*" element={<h1>Not Found</h1>} />
+      <CourseProvider>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoutes>
+                <Home />
+              </ProtectedRoutes>
+            }
+          />
+          <Route path="*" element={<h1>Not Found</h1>} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboardview />} />
+        </Routes>
+      </CourseProvider>
     </AuthProvider>
   );
 }
