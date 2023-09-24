@@ -4,7 +4,7 @@ import { Login } from "./components/Login";
 import { Register } from "./components/Register";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoutes } from "./components/ProtectedRoutes";
-import { Dashboardview } from "./views/Dashboardview";
+import { CourseView } from "./views/CourseView";
 import { CourseProvider } from "./context/CourseContext";
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboardview />} />
+          <Route path="/course" element={<CourseView />} />
         </Routes>
       </CourseProvider>
     </AuthProvider>

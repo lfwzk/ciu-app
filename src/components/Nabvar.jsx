@@ -3,28 +3,31 @@ import { useAuth } from "../context/AuthContext";
 
 export const Nabvar = () => {
   const { user, logout } = useAuth();
-  console.log(user);
-
   //console.log(user);
+
   const handleLogout = async () => {
     await logout();
   };
-  // Función para reducir el "display name" si es muy largo
+
   const truncateDisplayName = (displayName) => {
-    if (displayName.length > 20) {
+    if (displayName && displayName.length > 20) {
       return displayName.substring(0, 13) + "...";
     }
     return displayName;
   };
+
   const removeEmailDomain = (email) => {
-    const atIndex = email.indexOf("@"); // Busca la posición de la "@" en el correo electrónico
+    const atIndex = email.indexOf("@");
     if (atIndex !== -1) {
-      return email.substring(0, atIndex); // Elimina todo después de la "@" si se encuentra
+      return email.substring(0, atIndex);
     }
-    return email; // Retorna el correo sin cambios si no se encuentra la "@"
+    return email;
   };
-  const displayName = user.displayName || ""; // Establece un valor predeterminado si es nulo o indefinido
-  const email = user.email || "";
+
+  const displayName = user?.displayName || ""; // Usamos el operador de opcional para acceder a las propiedades
+  const email = user?.email || "";
+  const photoURL = user?.photoURL || ""; // Asegurarse de que photoURL esté definido
+
   return (
     <>
       <div className="navbar bg-base-100">
@@ -51,13 +54,13 @@ export const Nabvar = () => {
               className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <a>Home </a>
+                <a href="/">Home </a>
               </li>
               <li>
                 <a>Progress</a>
               </li>
               <li>
-                <a>Courses</a>
+                <a href="/course">Courses</a>
               </li>
             </ul>
           </div>
@@ -71,13 +74,13 @@ export const Nabvar = () => {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
             <li>
-              <a>Home</a>
+              <a href="/">Home</a>
             </li>
             <li>
               <a> Progress</a>
             </li>
             <li>
-              <a>Courses</a>
+              <a href="/course">Courses</a>
             </li>
           </ul>
         </div>
@@ -86,7 +89,7 @@ export const Nabvar = () => {
             <div className="dropdown dropdown-end">
               <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">
-                  <img src={user.photoURL} />
+                  <img src={photoURL} alt="User Avatar" />
                 </div>
               </label>
               <ul

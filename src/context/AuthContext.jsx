@@ -11,6 +11,8 @@ import {
 import { auth, db } from "../firebase/firebase.config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import defaultProfilePhoto from "../assets/defaultprofile.jpg";
+import { ref, getDownloadURL } from "firebase/storage"; // Asegúrate de importar getDownloadURL de firebase/storage
+import { storage } from "../firebase/firebase.config";
 
 export const authContext = createContext();
 
@@ -22,11 +24,16 @@ export const useAuth = () => {
 
   return context;
 };
+const getDefaultProfilePhotoURL = async () => {
+  const storageRef = ref(storage, "/default/defaultprofile.jpg"); // Reemplaza con la ruta correcta en tu Firebase Storage
+  const downloadURL = await getDownloadURL(storageRef);
+  return downloadURL;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Estado de usuario global, inicialmente nulo
   const [loading, setLoading] = useState(true); // Estado de carga global, inicialmente verdadero
-  const defaultPhotoURL = defaultProfilePhoto;
+  const [defaultPhotoURL, setDefaultPhotoURL] = useState("");
 
   const signup = async (email, password, displayName) => {
     try {
@@ -139,6 +146,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    getDefaultProfilePhotoURL()
+      .then((url) => {
+        setDefaultPhotoURL(url);
+      })
+      .catch((error) => {
+        console.error(
+          "Error al obtener la URL de la imagen predeterminada:",
+          error
+        );
+      });
+
     const unsuscribed = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
