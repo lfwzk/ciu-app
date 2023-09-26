@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoutes } from "./components/ProtectedRoutes";
 import { CourseView } from "./views/CourseView";
 import { CourseProvider } from "./context/CourseContext";
+import { EditCourse } from "./views/EditCourse";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/course" element={<CourseView />} />
+          <Route path="/course/:courseId" element={<EditCourse />} />
         </Routes>
       </CourseProvider>
     </AuthProvider>

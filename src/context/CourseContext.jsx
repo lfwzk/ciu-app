@@ -7,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
+  getDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 import { getDownloadURL } from "firebase/storage";
@@ -123,6 +124,24 @@ export const CourseProvider = ({ children }) => {
       throw error;
     }
   };
+  // Función para obtener un curso por su ID
+
+  const getCourseById = async (courseId) => {
+    try {
+      const docRef = doc(db, "courses", courseId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+      } else {
+        console.error(`No se encontró ningún curso con el ID ${courseId}`);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al obtener el curso por ID:", error);
+      throw error;
+    }
+  };
 
   return (
     <CourseContext.Provider
@@ -132,6 +151,7 @@ export const CourseProvider = ({ children }) => {
         createCourse,
         updateCourse,
         deleteCourse,
+        getCourseById,
       }}
     >
       {children}
