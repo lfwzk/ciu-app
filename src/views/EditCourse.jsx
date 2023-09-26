@@ -3,17 +3,26 @@ import { useCourse } from "../context/CourseContext";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Nabvar } from "../components/Nabvar";
+import { UnitForm } from "./UnitForm";
+import { CardForm } from "./CardForm"; // Importa el componente del formulario de tarjetas
 
 export const EditCourse = () => {
-  const { getCourseById, updateCourse } = useCourse();
+  const { getCourseById, updateCourse, addUnitToCourse } = useCourse();
   const { courseId } = useParams(); // Obtiene courseId de los parámetros de la URL
   const [course, setCourse] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-
+  const [units, setUnits] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     image: null,
+  });
+  const [isUnitFormVisible, setIsUnitFormVisible] = useState(false);
+  const [isCardFormVisible, setIsCardFormVisible] = useState(false);
+  const [unitData, setUnitData] = useState({
+    name: "",
+    description: "",
+    // Otros campos de la unidad...
   });
 
   useEffect(() => {
@@ -23,14 +32,14 @@ export const EditCourse = () => {
       console.log(fetchedCourse);
       if (fetchedCourse) {
         setCourse(fetchedCourse);
+        setUnits(fetchedCourse.units || []);
         setFormData({
           name: fetchedCourse.name,
           description: fetchedCourse.description,
-          image: null, // Si deseas mostrar la imagen actual, puedes establecerla aquí
+          image: null,
         });
-        setImageUrl(fetchedCourse.image); // Agrega esta línea
+        setImageUrl(fetchedCourse.image);
       } else {
-        // Maneja el caso en el que no se encuentra el curso
         console.error(`No se encontró ningún curso con el ID ${courseId}`);
       }
     };
@@ -46,27 +55,43 @@ export const EditCourse = () => {
     });
   };
 
+  const handleUnitFormSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      // Llama a la función addUnitToCourse para agregar la unidad al curso
+      await addUnitToCourse(courseId, unitData);
+      // Limpia el formulario o realiza cualquier otra acción necesaria
+      setUnitData({
+        name: "",
+        description: "",
+        // Otros campos de la unidad...
+      });
+      setUnits([...units, unitData]);
+    } catch (error) {
+      console.error("Error al agregar la unidad:", error);
+    }
+  };
+
   const handleSaveChanges = async () => {
-    // Asegúrate de que se haya seleccionado un curso y los campos no estén vacíos
     if (course && formData.name.trim() !== "") {
-      // Crea un objeto con los campos actualizados
       const updatedCourse = {
         name: formData.name,
         description: formData.description,
-        image: formData.image || course.image, // Mantén la imagen existente si no se ha seleccionado una nueva
+        image: formData.image || course.image,
+        units: units, // Agrega las unidades actualizadas al curso
       };
 
-      // Actualiza el curso en la base de datos
       await updateCourse(course.id, updatedCourse);
-
-      // Redirige o realiza cualquier otra acción después de guardar los cambios
     }
   };
-  if (!courseId) {
-    // Maneja el caso en el que courseId no tiene un valor válido
-    console.error("courseId no es válido:", courseId);
-    return;
-  }
+
+  const handleOpenUnitForm = () => {
+    setIsUnitFormVisible(true);
+  };
+  const handleOpenCardForm = () => {
+    setIsCardFormVisible(true);
+  };
 
   return (
     <div>
@@ -110,10 +135,38 @@ export const EditCourse = () => {
           <button type="button" onClick={handleSaveChanges}>
             Guardar Cambios
           </button>
+          <button type="button" onClick={handleOpenUnitForm}>
+            Agregar Unidad
+          </button>
           <Link to={`/course`}>Regresar</Link>
         </form>
       ) : (
         <p>Cargando...</p>
+      )}
+
+      {isUnitFormVisible && (
+        <UnitForm
+          courseId={courseId}
+          unitData={unitData}
+          setUnitData={setUnitData}
+          handleUnitFormSubmit={handleUnitFormSubmit}
+          addUnitToCourse={addUnitToCourse}
+        />
+      )}
+
+      {/* Muestra las unidades */}
+      {units.length > 0 && (
+        <div>
+          <h3>Unidades</h3>
+          <ul>
+            {units.map((unit, index) => (
+              <li key={index}>
+                {unit.name} - {unit.description}
+                {/* Mostrar otros campos de la unidad si los tienes */}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
