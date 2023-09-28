@@ -96,78 +96,116 @@ export const EditCourse = () => {
   return (
     <div>
       <Nabvar />
-      <h2>Editar Curso</h2>
-      {imageUrl && (
-        <div>
-          <label>Imagen Actual</label>
-          <img src={imageUrl} alt="Imagen del curso" className="h-40 w-40" />
-        </div>
-      )}
-      {course ? (
-        <form>
-          <div>
-            <label>Nombre del Curso</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleFormChange}
-            />
-          </div>
-          <div>
-            <label>Descripción</label>
-            <input
-              type="text"
-              name="description"
-              value={formData.description}
-              onChange={handleFormChange}
-            />
-          </div>
-          <div>
-            <label>Imagen</label>
-            <input
-              type="file"
-              name="image"
-              accept="image/*"
-              onChange={handleFormChange}
-            />
-          </div>
-          <button type="button" onClick={handleSaveChanges}>
-            Guardar Cambios
-          </button>
-          <button type="button" onClick={handleOpenUnitForm}>
-            Agregar Unidad
-          </button>
-          <Link to={`/course`}>Regresar</Link>
-        </form>
-      ) : (
-        <p>Cargando...</p>
-      )}
 
-      {isUnitFormVisible && (
-        <UnitForm
-          courseId={courseId}
-          unitData={unitData}
-          setUnitData={setUnitData}
-          handleUnitFormSubmit={handleUnitFormSubmit}
-          addUnitToCourse={addUnitToCourse}
-        />
-      )}
+      <div className="container mx-auto p-6">
+        <h2 className="text-5xl mb-6">Editar Curso - {formData.name}</h2>
+        {imageUrl && (
+          <div className="mb-6 text-center">
+            <label className="block mb-2">Imagen Actual</label>
+            <img
+              src={imageUrl}
+              alt="Imagen del curso"
+              className="h-80 w-auto rounded-lg mx-auto shadow-lg"
+            />
+          </div>
+        )}
 
-      {/* Muestra las unidades */}
-      {units.length > 0 && (
-        <div>
-          <h3>Unidades</h3>
-          <ul>
-            {units.map((unit, index) => (
-              <li key={index}>
-                {unit.name} - {unit.description}
-                {/* Mostrar otros campos de la unidad si los tienes */}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {course ? (
+          <form>
+            <div className="mb-4">
+              <label className="block mb-2">Nombre del Curso</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleFormChange}
+                className="border rounded-md p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2">Descripción</label>
+              <input
+                type="text"
+                name="description"
+                value={formData.description}
+                onChange={handleFormChange}
+                className="border rounded-md p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2">Imagen</label>
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleFormChange}
+                className="border rounded-md p-2"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveChanges}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mr-2"
+            >
+              Guardar Cambios
+            </button>
+            <button
+              type="button"
+              onClick={handleOpenUnitForm}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md mr-2"
+            >
+              Agregar Unidad
+            </button>
+            <Link to={`/course`} className="text-blue-500 hover:underline">
+              Regresar
+            </Link>
+          </form>
+        ) : (
+          <p>Cargando...</p>
+        )}
+
+        {isUnitFormVisible && (
+          <UnitForm
+            courseId={courseId}
+            unitData={unitData}
+            setUnitData={setUnitData}
+            handleUnitFormSubmit={handleUnitFormSubmit}
+            addUnitToCourse={addUnitToCourse}
+          />
+        )}
+
+        {/* Muestra las unidades */}
+        {units.length > 0 && (
+          <div className=" backdrop-blur-lg p-4 rounded-md shadow-md">
+            <h3 className="text-3xl mb-4 font-semibold text-white">Unidades</h3>
+            <ul className="space-y-2">
+              {units.map((unit, index) => (
+                <li
+                  key={index}
+                  className="p-4  bg-opacity-80 rounded-md shadow-md flex items-center justify-between"
+                >
+                  <div>
+                    <h4 className="text-2xl font-semibold ">{unit.name}</h4>
+                    <p className="text-gray-200">
+                      {" "}
+                      <p className="text-green-500">Descripcion:</p>
+                      <br />
+                      {unit.description}
+                    </p>
+                    {/* Mostrar otros campos de la unidad si los tienes */}
+                  </div>
+                  <Link
+                    to={`/course/${courseId}/units/${unit.id}/edit`}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+                  >
+                    Detalles
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

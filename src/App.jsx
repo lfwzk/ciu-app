@@ -7,6 +7,7 @@ import { ProtectedRoutes } from "./components/ProtectedRoutes";
 import { CourseView } from "./views/CourseView";
 import { CourseProvider } from "./context/CourseContext";
 import { EditCourse } from "./views/EditCourse";
+import { EditUnit } from "./views/EditUnit";
 
 function App() {
   return (
@@ -27,6 +28,10 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/course" element={<CourseView />} />
           <Route path="/course/:courseId" element={<EditCourse />} />
+          <Route
+            path="/course/:courseId/units/:unitId/edit"
+            element={<EditUnit />} // Reemplaza 'EditUnit' con el nombre de tu componente de edición de unidades
+          />
         </Routes>
       </CourseProvider>
     </AuthProvider>

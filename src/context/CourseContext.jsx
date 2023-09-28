@@ -153,6 +153,20 @@ export const CourseProvider = ({ children }) => {
         const courseData = courseDoc.data();
         const units = courseData.units || []; // Asegúrate de que units sea un arreglo
 
+        // Genera un ID único para la unidad en el lado del servidor de Firebase
+        const unitRef = await addDoc(
+          collection(db, `courses/${courseId}/units`),
+          {
+            ...unitData,
+          }
+        );
+
+        // Obtiene el ID generado por Firebase
+        const unitId = unitRef.id;
+
+        // Asigna el ID a los datos de la unidad
+        unitData.id = unitId;
+
         // Agrega la nueva unidad al arreglo de unidades
         units.push(unitData);
 
@@ -173,97 +187,57 @@ export const CourseProvider = ({ children }) => {
       throw error;
     }
   };
-  const updateUnitInCourse = async (courseId, unitId, updatedUnitData) => {
+  const getUnitById = async (courseId, unitId) => {
     try {
-      const courseRef = doc(db, "courses", courseId);
-      const courseDoc = await getDoc(courseRef);
-
-      if (courseDoc.exists()) {
-        const courseData = courseDoc.data();
-        const units = courseData.units || [];
-
-        // Encuentra la unidad que deseas actualizar
-        const updatedUnits = units.map((unit) =>
-          unit.id === unitId ? { ...unit, ...updatedUnitData } : unit
-        );
-
-        // Actualiza las unidades en el documento del curso
-        await updateDoc(courseRef, { units: updatedUnits });
-
-        // Actualiza el estado local con las unidades actualizadas
-        setCourses((prevCourses) =>
-          prevCourses.map((course) =>
-            course.id === courseId ? { ...course, units: updatedUnits } : course
-          )
-        );
-      } else {
-        console.error(`No se encontró ningún curso con el ID ${courseId}`);
-      }
-    } catch (error) {
-      console.error("Error al actualizar la unidad en el curso:", error);
-      throw error;
-    }
-  };
-
-  const deleteUnitFromCourse = async (courseId, unitId) => {
-    try {
-      const courseRef = doc(db, "courses", courseId);
-      const courseDoc = await getDoc(courseRef);
-
-      if (courseDoc.exists()) {
-        const courseData = courseDoc.data();
-        const units = courseData.units || [];
-
-        // Filtra la unidad que deseas eliminar
-        const updatedUnits = units.filter((unit) => unit.id !== unitId);
-
-        // Actualiza las unidades en el documento del curso
-        await updateDoc(courseRef, { units: updatedUnits });
-
-        // Actualiza el estado local con las unidades actualizadas
-        setCourses((prevCourses) =>
-          prevCourses.map((course) =>
-            course.id === courseId ? { ...course, units: updatedUnits } : course
-          )
-        );
-      } else {
-        console.error(`No se encontró ningún curso con el ID ${courseId}`);
-      }
-    } catch (error) {
-      console.error("Error al eliminar la unidad del curso:", error);
-      throw error;
-    }
-  };
-
-  const addCardToUnit = async (unitId, cardData) => {
-    try {
-      // Obtén la unidad específica por su ID
-      const unitRef = doc(db, "units", unitId);
+      const unitRef = doc(db, `courses/${courseId}/units`, unitId);
       const unitDoc = await getDoc(unitRef);
 
       if (unitDoc.exists()) {
-        const unitData = unitDoc.data();
-        const cards = unitData.cards || []; // Asegúrate de que cards sea un arreglo
-
-        // Agrega la nueva tarjeta al arreglo de tarjetas de la unidad
-        cards.push(cardData);
-
-        // Actualiza las tarjetas en el documento de la unidad
-        await updateDoc(unitRef, { cards });
-
-        // Actualiza el estado local con las tarjetas actualizadas
-        setCourses((prevCourses) =>
-          prevCourses.map((course) =>
-            course.units.map((unit) =>
-              unit.id === unitId ? { ...unit, cards } : unit
-            )
-          )
-        );
+        return { id: unitDoc.id, ...unitDoc.data() };
       } else {
         console.error(`No se encontró ninguna unidad con el ID ${unitId}`);
+        return null;
       }
     } catch (error) {
-      console.error("Error al agregar una tarjeta a la unidad:", error);
+      console.error("Error al obtener la unidad por ID:", error);
+      throw error;
+    }
+  };
+
+  const updateUnit = async (courseId, unitId, updatedUnitData) => {
+    console.log("Llamando a updateUnit con unitId:", unitId);
+    console.log("updatedUnitData:", updatedUnitData);
+
+    try {
+      // Construye la referencia del documento de la unidad en Firestore
+      const unitRef = doc(db, `courses/${courseId}/units/${unitId}`);
+
+      // Actualiza el documento de la unidad con los datos actualizados
+      await updateDoc(unitRef, updatedUnitData);
+
+      console.log("Unidad actualizada con éxito");
+
+      return { id: unitId, ...updatedUnitData };
+    } catch (error) {
+      console.error("Error al actualizar la unidad:", error);
+      throw error;
+    }
+  };
+  const deleteUnit = async (courseId, unitId) => {
+    try {
+      // Construye la referencia del documento de la unidad en Firestore
+      const unitRef = doc(db, `courses/${courseId}/units/${unitId}`);
+
+      // Elimina el documento de la unidad
+      await deleteDoc(unitRef);
+
+      // Realiza cualquier otra actualización necesaria, como actualizar el estado local
+
+      console.log("Unidad eliminada con éxito");
+
+      // Puedes retornar algún valor si lo deseas
+    } catch (error) {
+      console.error("Error al eliminar la unidad:", error);
       throw error;
     }
   };
@@ -278,9 +252,9 @@ export const CourseProvider = ({ children }) => {
         deleteCourse,
         getCourseById,
         addUnitToCourse,
-        updateUnitInCourse,
-        deleteUnitFromCourse,
-        addCardToUnit,
+        getUnitById,
+        updateUnit,
+        deleteUnit,
       }}
     >
       {children}
