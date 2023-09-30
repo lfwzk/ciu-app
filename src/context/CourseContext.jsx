@@ -8,6 +8,9 @@ import {
   deleteDoc,
   addDoc,
   getDoc,
+  setDoc,
+  query, // Agrega esta línea para importar 'query'
+  where, // Si también utilizas 'where', asegúrate de importarlo
 } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 import { getDownloadURL } from "firebase/storage";
@@ -35,6 +38,7 @@ export const useCourse = () => {
 export const CourseProvider = ({ children }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userEnrollments, setUserEnrollments] = useState([]);
 
   // Función para cargar cursos desde Firestore
   const loadCourses = async () => {
@@ -204,40 +208,72 @@ export const CourseProvider = ({ children }) => {
     }
   };
 
-  const updateUnit = async (courseId, unitId, updatedUnitData) => {
-    console.log("Llamando a updateUnit con unitId:", unitId);
-    console.log("updatedUnitData:", updatedUnitData);
-
+  const enrollUserInCourse = async (userId, courseId) => {
     try {
-      // Construye la referencia del documento de la unidad en Firestore
-      const unitRef = doc(db, `courses/${courseId}/units/${unitId}`);
+      // Verificar si el usuario ya está matriculado en el curso
+      const isEnrolled = userEnrollments.some(
+        (enrollment) =>
+          enrollment.userId === userId && enrollment.courseId === courseId
+      );
 
-      // Actualiza el documento de la unidad con los datos actualizados
-      await updateDoc(unitRef, updatedUnitData);
+      if (!isEnrolled) {
+        // Matricular al usuario en el curso (implementa la lógica aquí)
+        // Ejemplo de almacenamiento en Firestore
+        await setDoc(doc(db, "enrollments", `${userId}_${courseId}`), {
+          userId,
+          courseId,
+        });
 
-      console.log("Unidad actualizada con éxito");
-
-      return { id: unitId, ...updatedUnitData };
+        // Agregar la matriculación a la lista de matriculaciones de usuario
+        setUserEnrollments((prevEnrollments) => [
+          ...prevEnrollments,
+          { userId, courseId },
+        ]);
+      }
     } catch (error) {
-      console.error("Error al actualizar la unidad:", error);
+      console.error("Error al matricular al usuario en el curso:", error);
       throw error;
     }
   };
-  const deleteUnit = async (courseId, unitId) => {
+
+  // Función para verificar si un usuario está matriculado en un curso
+  const checkEnrollmentStatus = async (userId, courseId) => {
     try {
-      // Construye la referencia del documento de la unidad en Firestore
-      const unitRef = doc(db, `courses/${courseId}/units/${unitId}`);
+      const enrollmentDoc = await getDoc(
+        doc(db, "enrollments", `${userId}_${courseId}`)
+      );
 
-      // Elimina el documento de la unidad
-      await deleteDoc(unitRef);
-
-      // Realiza cualquier otra actualización necesaria, como actualizar el estado local
-
-      console.log("Unidad eliminada con éxito");
-
-      // Puedes retornar algún valor si lo deseas
+      return enrollmentDoc.exists();
     } catch (error) {
-      console.error("Error al eliminar la unidad:", error);
+      console.error("Error al verificar el estado de matriculación:", error);
+      throw error;
+    }
+  };
+  const getCoursesByUserId = async (userId) => {
+    try {
+      // Consulta la colección "enrollments" para obtener los cursos matriculados por el usuario
+      const querySnapshot = await getDocs(
+        query(collection(db, "enrollments"), where("userId", "==", userId))
+      );
+
+      const enrolledCourses = [];
+
+      for (const docSnapshot of querySnapshot.docs) {
+        const enrollmentData = docSnapshot.data();
+        const courseId = enrollmentData.courseId;
+
+        // Consulta la colección "courses" para obtener los detalles del curso
+        const courseDoc = await getDoc(doc(db, "courses", courseId));
+
+        if (courseDoc.exists()) {
+          const courseData = courseDoc.data();
+          enrolledCourses.push({ id: courseId, ...courseData });
+        }
+      }
+
+      return enrolledCourses;
+    } catch (error) {
+      console.error("Error al obtener cursos matriculados por usuario:", error);
       throw error;
     }
   };
@@ -253,8 +289,9 @@ export const CourseProvider = ({ children }) => {
         getCourseById,
         addUnitToCourse,
         getUnitById,
-        updateUnit,
-        deleteUnit,
+        enrollUserInCourse,
+        checkEnrollmentStatus,
+        getCoursesByUserId,
       }}
     >
       {children}

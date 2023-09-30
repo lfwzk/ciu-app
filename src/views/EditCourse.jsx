@@ -186,7 +186,7 @@ export const EditCourse = () => {
                 >
                   <div>
                     <h4 className="text-2xl font-semibold ">{unit.name}</h4>
-                    <p className="text-gray-200">
+                    <p>
                       {" "}
                       <p className="text-green-500">Descripcion:</p>
                       <br />

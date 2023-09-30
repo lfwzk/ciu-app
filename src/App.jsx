@@ -22,8 +22,9 @@ function App() {
               </ProtectedRoutes>
             }
           />
+          Rot
           <Route path="*" element={<h1>Not Found</h1>} />
-
+          <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/course" element={<CourseView />} />
