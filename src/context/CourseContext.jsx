@@ -277,6 +277,68 @@ export const CourseProvider = ({ children }) => {
       throw error;
     }
   };
+  const addCardToUnit = async (courseId, unitId, cardData) => {
+    try {
+      const unitRef = doc(db, `courses/${courseId}/units`, unitId);
+      const unitDoc = await getDoc(unitRef);
+
+      if (unitDoc.exists()) {
+        const unitData = unitDoc.data();
+        const cards = unitData.cards || []; // Asegúrate de que cards sea un arreglo
+
+        // Genera un ID único para la tarjeta en el lado del servidor de Firebase
+        const cardRef = await addDoc(
+          collection(db, `courses/${courseId}/units/${unitId}/cards`),
+          {
+            ...cardData,
+          }
+        );
+
+        // Obtiene el ID generado por Firebase
+        const cardId = cardRef.id;
+
+        // Asigna el ID a los datos de la tarjeta
+        cardData.id = cardId;
+
+        // Agrega la nueva tarjeta al arreglo de tarjetas
+        cards.push(cardData);
+
+        // Actualiza las tarjetas en el documento de la unidad
+        await updateDoc(unitRef, { cards });
+
+        // Actualiza el estado local con las tarjetas actualizadas
+        // (este paso es opcional si estás haciendo una carga completa de las unidades desde Firebase)
+        // ... implementa la lógica para actualizar el estado local aquí si es necesario ...
+      } else {
+        console.error(`No se encontró ninguna unidad con el ID ${unitId}`);
+      }
+    } catch (error) {
+      console.error("Error al agregar una tarjeta a la unidad:", error);
+      throw error;
+    }
+  };
+
+  // Agrega esta función para obtener una tarjeta por su ID
+  const getCardById = async (courseId, unitId, cardId) => {
+    try {
+      const cardRef = doc(
+        db,
+        `courses/${courseId}/units/${unitId}/cards`,
+        cardId
+      );
+      const cardDoc = await getDoc(cardRef);
+
+      if (cardDoc.exists()) {
+        return { id: cardDoc.id, ...cardDoc.data() };
+      } else {
+        console.error(`No se encontró ninguna tarjeta con el ID ${cardId}`);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al obtener la tarjeta por ID:", error);
+      throw error;
+    }
+  };
 
   return (
     <CourseContext.Provider
@@ -292,6 +354,8 @@ export const CourseProvider = ({ children }) => {
         enrollUserInCourse,
         checkEnrollmentStatus,
         getCoursesByUserId,
+        addCardToUnit,
+        getCardById,
       }}
     >
       {children}

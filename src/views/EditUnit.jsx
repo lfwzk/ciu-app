@@ -5,14 +5,23 @@ import { Nabvar } from "../components/Nabvar";
 
 export const EditUnit = () => {
   const { courseId, unitId } = useParams();
-
-  const { getUnitById } = useCourse();
+  const {
+    getUnitById,
+    addCardToUnit,
+    getCardById,
+    updateCardInUnit,
+    deleteCardFromUnit,
+  } = useCourse();
   const [unit, setUnit] = useState(null);
   const [showAddCards, setShowAddCards] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     // Otros campos de la unidad...
+  });
+  const [cardForm, setCardForm] = useState({
+    question: "",
+    answer: "",
   });
 
   useEffect(() => {
@@ -38,13 +47,31 @@ export const EditUnit = () => {
 
     fetchUnit();
   }, [courseId, unitId, getUnitById]); // Añade courseId a las dependencias
-
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setCardForm({
+      ...cardForm,
       [name]: value,
     });
+  };
+
+  const handleAddCard = async () => {
+    try {
+      // Llama a la función addCardToUnit para agregar la tarjeta a la unidad actual
+      await addCardToUnit(courseId, unitId, cardForm);
+
+      // Actualiza el estado local para reflejar los cambios
+      const updatedUnit = await getUnitById(courseId, unitId);
+      setUnit(updatedUnit);
+
+      // Limpia el formulario después de agregar la tarjeta
+      setCardForm({
+        question: "",
+        answer: "",
+      });
+    } catch (error) {
+      console.error("Error al agregar la tarjeta:", error);
+    }
   };
 
   return (
@@ -80,16 +107,56 @@ export const EditUnit = () => {
         {/* Tarjetas adicionales */}
         {showAddCards && (
           <div className="mt-4 p-4 border border-gray-300 rounded">
-            {/* Aquí puedes agregar tarjetas adicionales */}
-            <div className="mb-4">
-              <h3 className="text-xl font-semibold">Título de la Tarjeta 1</h3>
-              <p>Contenido de la Tarjeta 1</p>
+            <div className="mt-4 p-4 border border-gray-300 rounded">
+              <h2 className="text-xl font-semibold mb-4">Agregar Tarjeta</h2>
+              <form>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Pregunta
+                  </label>
+                  <input
+                    type="text"
+                    name="question"
+                    value={cardForm.question}
+                    onChange={handleFormChange}
+                    className="mt-1 p-2 w-full border rounded"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Respuesta
+                  </label>
+                  <input
+                    type="text"
+                    name="answer"
+                    value={cardForm.answer}
+                    onChange={handleFormChange}
+                    className="mt-1 p-2 w-full border rounded"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddCard}
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Agregar Tarjeta
+                </button>
+              </form>
             </div>
-            <div>
-              <h3 className="text-xl font-semibold">Título de la Tarjeta 2</h3>
-              <p>Contenido de la Tarjeta 2</p>
-            </div>
-            {/* Agrega más tarjetas según sea necesario */}
+            {/* Mapea las tarjetas de la unidad */}
+            {unit.cards && unit.cards.length > 0 ? (
+              unit.cards.map((card) => (
+                <div key={card.id} className="mb-4">
+                  <h3 className="text-xl font-semibold">{card.question}</h3>
+                  <p>{card.answer}</p>
+                  {/* Agrega botones para editar y eliminar la tarjeta según sea necesario */}
+                </div>
+              ))
+            ) : (
+              <p>No hay tarjetas disponibles en esta unidad.</p>
+            )}
+
+            {/* Botón para agregar una nueva tarjeta */}
           </div>
         )}
       </div>
