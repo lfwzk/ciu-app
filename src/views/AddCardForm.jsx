@@ -14,11 +14,20 @@ export const AddCardForm = ({ onAddCard }) => {
     }
 
     // Llamar a la función proporcionada por las props para agregar la tarjeta
-    onAddCard({ question, answer });
+    onAddCard({
+      question,
+      answer,
+      repetitions,
+      interval,
+      easeFactor,
+    });
 
     // Limpiar el formulario después de agregar la tarjeta
     setQuestion("");
     setAnswer("");
+    setRepetitions(0);
+    setInterval(1);
+    setEaseFactor(2.5);
   };
 
   return (

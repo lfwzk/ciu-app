@@ -287,6 +287,13 @@ export const CourseProvider = ({ children }) => {
         const cards = unitData.cards || []; // Asegúrate de que cards sea un arreglo
 
         // Genera un ID único para la tarjeta en el lado del servidor de Firebase
+
+        cardData.repetitions =
+          typeof cardData.repetitions === "number" ? cardData.repetitions : 0;
+        cardData.interval =
+          typeof cardData.interval === "number" ? cardData.interval : 1;
+        cardData.easeFactor =
+          typeof cardData.easeFactor === "number" ? cardData.easeFactor : 2.5;
         const cardRef = await addDoc(
           collection(db, `courses/${courseId}/units/${unitId}/cards`),
           {
@@ -318,8 +325,52 @@ export const CourseProvider = ({ children }) => {
     }
   };
 
-  // Agrega esta función para obtener una tarjeta por su ID
-  const getCardById = async (courseId, unitId, cardId) => {
+  const getCardsByUnitId = async (courseId, unitId) => {
+    try {
+      if (!courseId || !unitId) {
+        throw new Error("courseId o unitId no están definidos.");
+      }
+
+      const cardsRef = collection(
+        db,
+        `courses/${courseId}/units/${unitId}/cards`
+      );
+      const querySnapshot = await getDocs(cardsRef);
+
+      if (querySnapshot.empty) {
+        console.log("No se encontraron tarjetas para esta unidad.");
+        return [];
+      }
+
+      const cards = querySnapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+
+      console.log("Course ID:", courseId);
+      console.log("Unit ID:", unitId);
+      console.log("Cards:", cards);
+
+      return cards;
+    } catch (error) {
+      console.error(
+        "Error al obtener las tarjetas de la unidad:",
+        error.message
+      );
+      throw error;
+    }
+  };
+
+  // Supermemo Algorithm
+
+  const applySuperMemoAlgorithm = async (
+    courseId,
+    unitId,
+    cardId,
+    responseQuality
+  ) => {
     try {
       const cardRef = doc(
         db,
@@ -329,17 +380,76 @@ export const CourseProvider = ({ children }) => {
       const cardDoc = await getDoc(cardRef);
 
       if (cardDoc.exists()) {
-        return { id: cardDoc.id, ...cardDoc.data() };
+        const cardData = cardDoc.data();
+        const { repetitions, interval, easeFactor } = cardData;
+
+        // Parámetros del algoritmo SM2
+        const INITIAL_EF = 2.5; // Factor de olvido inicial
+        const MINIMUM_EF = 1.3; // Factor de olvido mínimo
+        const CORRECT_ANSWER_QUALITY = 4; // Calidad de respuesta para respuestas correctas (en una escala del 1 al 5)
+        const INCORRECT_ANSWER_QUALITY = 1; // Calidad de respuesta para respuestas incorrectas (en una escala del 1 al 5)
+
+        // Calcular el nuevo intervalo y el factor de facilidad (EF)
+        let updatedRepetitions = repetitions || 0; // Establece un valor predeterminado si repetitions es undefined
+        let updatedInterval = interval;
+        let updatedEaseFactor = easeFactor;
+
+        if (responseQuality >= CORRECT_ANSWER_QUALITY) {
+          if (repetitions === 0) {
+            updatedInterval = 1;
+          } else if (repetitions === 1) {
+            updatedInterval = 6;
+          } else {
+            updatedInterval *= easeFactor;
+          }
+
+          updatedRepetitions++;
+          updatedEaseFactor = Math.max(easeFactor + 0.1, MINIMUM_EF);
+        } else if (responseQuality === INCORRECT_ANSWER_QUALITY) {
+          updatedRepetitions = 0;
+          updatedInterval = 1;
+          updatedEaseFactor = INITIAL_EF;
+        }
+
+        // Actualizar los datos de la tarjeta en Firebase
+        if (
+          !isNaN(updatedRepetitions) &&
+          !isNaN(updatedInterval) &&
+          !isNaN(updatedEaseFactor)
+        ) {
+          // Actualizar los datos de la tarjeta en Firebase
+          await updateDoc(cardRef, {
+            repetitions: updatedRepetitions,
+            interval: updatedInterval,
+            easeFactor: updatedEaseFactor,
+          });
+        } else {
+          console.error(
+            "Datos de tarjeta no válidos:",
+            updatedRepetitions,
+            updatedInterval,
+            updatedEaseFactor
+          );
+        }
+        // Devuelve los datos actualizados de la tarjeta
+        return {
+          ...cardData,
+          repetitions: updatedRepetitions,
+          interval: updatedInterval,
+          easeFactor: updatedEaseFactor,
+        };
       } else {
         console.error(`No se encontró ninguna tarjeta con el ID ${cardId}`);
         return null;
       }
     } catch (error) {
-      console.error("Error al obtener la tarjeta por ID:", error);
+      console.error(
+        "Error al aplicar SuperMemo y actualizar la tarjeta:",
+        error
+      );
       throw error;
     }
   };
-
   return (
     <CourseContext.Provider
       value={{
@@ -355,7 +465,8 @@ export const CourseProvider = ({ children }) => {
         checkEnrollmentStatus,
         getCoursesByUserId,
         addCardToUnit,
-        getCardById,
+        applySuperMemoAlgorithm,
+        getCardsByUnitId,
       }}
     >
       {children}

@@ -8,6 +8,7 @@ import { CourseView } from "./views/CourseView";
 import { CourseProvider } from "./context/CourseContext";
 import { EditCourse } from "./views/EditCourse";
 import { EditUnit } from "./views/EditUnit";
+import { SuperMemo } from "./views/Supermemo";
 
 function App() {
   return (
@@ -32,6 +33,10 @@ function App() {
           <Route
             path="/course/:courseId/units/:unitId/edit"
             element={<EditUnit />} // Reemplaza 'EditUnit' con el nombre de tu componente de edición de unidades
+          />
+          <Route
+            path="/course/:courseId/units/:unitId/supermemo"
+            element={<SuperMemo />} // Reemplaza 'SuperMemo' con el nombre de tu componente de repetición espaciada
           />
         </Routes>
       </CourseProvider>
