@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import img1 from "../assets/CIU.png";
 import {
   FiMenu,
   FiHome,
@@ -45,7 +46,7 @@ export const Nabvar = () => {
 
   return (
     <>
-      <div className="navbar bg-base-100  ">
+      <div className="navbar bg-[#4BC7E7]  text-white ">
         <div className="navbar-start">
           <div className="dropdown">
             <label
@@ -82,8 +83,9 @@ export const Nabvar = () => {
             )}
           </div>
           <div className="flex-1">
-            <Link className="btn btn-ghost normal-case text-xl " to="/">
-              CIU APP
+            <Link className="btn btn-ghost normal-case text-xl" to="/">
+              <img src={img1} alt="" className="w-48 h-auto rounded-md" />{" "}
+              {/* Utiliza las clases w-24 para el ancho y h-auto para la altura */}
             </Link>
           </div>
         </div>

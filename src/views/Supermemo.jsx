@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useCourse } from "../context/CourseContext";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 export const SuperMemo = () => {
   const { applySuperMemoAlgorithm, getCardsByUnitId } = useCourse();
   const [cards, setCards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [finished, setFinished] = useState(false);
   const { courseId, unitId } = useParams();
 
   useEffect(() => {
@@ -18,8 +19,8 @@ export const SuperMemo = () => {
           fetchedCards.map((card) => ({
             ...card,
             easeFactor: isNaN(card.easeFactor) ? 2.5 : card.easeFactor,
-            interval: isNaN(card.interval) ? 1 : card.interval || 1, // Establecer en 1 si interval es undefined
-            repetitions: isNaN(card.repetitions) ? 0 : card.repetitions || 0, // Establecer en 0 si repetitions es undefined
+            interval: isNaN(card.interval) ? 1 : card.interval || 1,
+            repetitions: isNaN(card.repetitions) ? 0 : card.repetitions || 0,
           }))
         );
       } catch (error) {
@@ -38,7 +39,6 @@ export const SuperMemo = () => {
     try {
       const currentCard = cards[currentCardIndex];
 
-      // Verificar si currentCardIndex está dentro del rango válido
       if (
         currentCard &&
         !isNaN(currentCard.repetitions) &&
@@ -53,7 +53,6 @@ export const SuperMemo = () => {
           responseQuality
         );
 
-        // Verificar si updatedCard es válido
         if (
           updatedCard &&
           !isNaN(updatedCard.repetitions) &&
@@ -72,9 +71,9 @@ export const SuperMemo = () => {
             if (nextCardIndex < updatedCards.length) {
               setCurrentCardIndex(nextCardIndex);
             } else {
-              console.log("No hay más tarjetas para mostrar.");
+              setFinished(true);
             }
-          }, 1000); // Cambia este valor si deseas ajustar la duración de la respuesta mostrada
+          }, 1000);
         } else {
           console.error("Datos de tarjeta no válidos:", updatedCard);
         }
@@ -87,26 +86,62 @@ export const SuperMemo = () => {
   };
 
   return (
-    <div>
-      {cards.length > 0 && currentCardIndex < cards.length && (
+    <div className="p-8 border rounded-lg shadow-lg">
+      {finished ? (
         <div>
-          <h1>Repetición Espaciada</h1>
-          <div>
-            <strong>Pregunta:</strong> {cards[currentCardIndex].question}
-          </div>
-          {showAnswer && (
+          <h1 className="text-2xl font-bold mb-4">
+            ¡Felicidades! Has completado todas las tarjetas de aprendizaje.
+          </h1>
+          <p>Vuelve a la pantalla principal para explorar más contenido.</p>
+          <Link to="/" className="text-blue-500 hover:underline mt-4 block">
+            Volver a la pantalla principal
+          </Link>
+        </div>
+      ) : (
+        <div>
+          {cards.length > 0 && currentCardIndex < cards.length && (
             <div>
-              <strong>Respuesta:</strong> {cards[currentCardIndex].answer}
+              <h1 className="text-2xl font-bold mb-4">Repetición Espaciada</h1>
+              <div className="mb-4">
+                <strong className="font-semibold">Pregunta:</strong>{" "}
+                {cards[currentCardIndex].question}
+              </div>
+              {showAnswer && (
+                <div className="mb-4">
+                  <strong className="font-semibold">Respuesta:</strong>{" "}
+                  {cards[currentCardIndex].answer}
+                </div>
+              )}
+              {!showAnswer && (
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={handleShowAnswer}
+                >
+                  Mostrar Respuesta
+                </button>
+              )}
+              <div className="mt-4 space-x-4">
+                <button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => handleResponse(5)}
+                >
+                  Fácil
+                </button>
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => handleResponse(3)}
+                >
+                  Medio
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => handleResponse(1)}
+                >
+                  Difícil
+                </button>
+              </div>
             </div>
           )}
-          {!showAnswer && (
-            <button onClick={handleShowAnswer}>Mostrar Respuesta</button>
-          )}
-          <div>
-            <button onClick={() => handleResponse(5)}>Fácil</button>
-            <button onClick={() => handleResponse(3)}>Medio</button>
-            <button onClick={() => handleResponse(1)}>Difícil</button>
-          </div>
         </div>
       )}
     </div>
