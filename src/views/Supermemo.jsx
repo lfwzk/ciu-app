@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useCourse } from "../context/CourseContext";
 import { useParams, Link } from "react-router-dom";
+import { Nabvar } from "../components/Nabvar";
 
 export const SuperMemo = () => {
   const { applySuperMemoAlgorithm, getCardsByUnitId } = useCourse();
@@ -86,64 +87,69 @@ export const SuperMemo = () => {
   };
 
   return (
-    <div className="p-8 border rounded-lg shadow-lg">
-      {finished ? (
-        <div>
-          <h1 className="text-2xl font-bold mb-4">
-            ¡Felicidades! Has completado todas las tarjetas de aprendizaje.
-          </h1>
-          <p>Vuelve a la pantalla principal para explorar más contenido.</p>
-          <Link to="/" className="text-blue-500 hover:underline mt-4 block">
-            Volver a la pantalla principal
-          </Link>
-        </div>
-      ) : (
-        <div>
-          {cards.length > 0 && currentCardIndex < cards.length && (
-            <div>
-              <h1 className="text-2xl font-bold mb-4">Repetición Espaciada</h1>
-              <div className="mb-4">
-                <strong className="font-semibold">Pregunta:</strong>{" "}
-                {cards[currentCardIndex].question}
-              </div>
-              {showAnswer && (
+    <>
+      <Nabvar />
+      <div className="p-8 border rounded-lg shadow-lg">
+        {finished ? (
+          <div>
+            <h1 className="text-2xl font-bold mb-4">
+              ¡Felicidades! Has completado todas las tarjetas de aprendizaje.
+            </h1>
+            <p>Vuelve a la pantalla principal para explorar más contenido.</p>
+            <Link to="/" className="text-blue-500 hover:underline mt-4 block">
+              Volver a la pantalla principal
+            </Link>
+          </div>
+        ) : (
+          <div>
+            {cards.length > 0 && currentCardIndex < cards.length && (
+              <div>
+                <h1 className="text-2xl font-bold mb-4">
+                  Repetición Espaciada
+                </h1>
                 <div className="mb-4">
-                  <strong className="font-semibold">Respuesta:</strong>{" "}
-                  {cards[currentCardIndex].answer}
+                  <strong className="font-semibold">Pregunta:</strong>{" "}
+                  {cards[currentCardIndex].question}
                 </div>
-              )}
-              {!showAnswer && (
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={handleShowAnswer}
-                >
-                  Mostrar Respuesta
-                </button>
-              )}
-              <div className="mt-4 space-x-4">
-                <button
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={() => handleResponse(5)}
-                >
-                  Fácil
-                </button>
-                <button
-                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={() => handleResponse(3)}
-                >
-                  Medio
-                </button>
-                <button
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={() => handleResponse(1)}
-                >
-                  Difícil
-                </button>
+                {showAnswer && (
+                  <div className="mb-4">
+                    <strong className="font-semibold">Respuesta:</strong>{" "}
+                    {cards[currentCardIndex].answer}
+                  </div>
+                )}
+                {!showAnswer && (
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={handleShowAnswer}
+                  >
+                    Mostrar Respuesta
+                  </button>
+                )}
+                <div className="mt-4 space-x-4">
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => handleResponse(5)}
+                  >
+                    Fácil
+                  </button>
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => handleResponse(3)}
+                  >
+                    Medio
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => handleResponse(1)}
+                  >
+                    Difícil
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 };

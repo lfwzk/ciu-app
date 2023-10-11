@@ -6,8 +6,13 @@ import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 
 export const CourseView = () => {
-  const { courses, createCourse, enrollUserInCourse, checkEnrollmentStatus } =
-    useCourse();
+  const {
+    courses,
+    createCourse,
+    enrollUserInCourse,
+    checkEnrollmentStatus,
+    deleteCourse,
+  } = useCourse();
   const [newCourse, setNewCourse] = useState({
     name: "",
     description: "",
