@@ -91,7 +91,44 @@ export const CourseView = () => {
     <>
       <Nabvar />
       <div>
-        <h2 className="text-5xl">Lista de Cursos</h2>
+        <div>
+          <h2 className="text-5xl py-10 px-5">Crea un nuevo curso </h2>
+          <input
+            type="text"
+            placeholder="Nuevo Curso"
+            value={newCourse.name}
+            onChange={(e) =>
+              setNewCourse({
+                ...newCourse,
+                name: e.target.value,
+              })
+            }
+          />
+          <input
+            type="text"
+            placeholder="Descripción"
+            value={newCourse.description}
+            onChange={(e) =>
+              setNewCourse({
+                ...newCourse,
+                description: e.target.value,
+              })
+            }
+          />
+          {/* Campo de entrada para cargar una imagen */}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setNewCourse({
+                ...newCourse,
+                image: e.target.files[0],
+              })
+            }
+          />
+          <button onClick={handleCreateCourse}>Agregar Curso</button>
+        </div>
+        <h2 className="text-5xl py-10">Cursos creados</h2>
         <ul>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 m-19">
             {courses.map((course) => (
@@ -206,44 +243,6 @@ export const CourseView = () => {
             ))}
           </div>
         </ul>
-
-        <div>
-          <h2 className="text-2xl">Crea un nuevo curso</h2>
-          <input
-            type="text"
-            placeholder="Nuevo Curso"
-            value={newCourse.name}
-            onChange={(e) =>
-              setNewCourse({
-                ...newCourse,
-                name: e.target.value,
-              })
-            }
-          />
-          <input
-            type="text"
-            placeholder="Descripción"
-            value={newCourse.description}
-            onChange={(e) =>
-              setNewCourse({
-                ...newCourse,
-                description: e.target.value,
-              })
-            }
-          />
-          {/* Campo de entrada para cargar una imagen */}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) =>
-              setNewCourse({
-                ...newCourse,
-                image: e.target.files[0],
-              })
-            }
-          />
-          <button onClick={handleCreateCourse}>Agregar Curso</button>
-        </div>
       </div>
       <Footer />
     </>
