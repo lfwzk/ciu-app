@@ -36,37 +36,40 @@ export const Home = () => {
           Bienvenid@ 🎉 {user.displayName || user.email}
         </p>
 
-        <div className="card w-full md:w-[500px] bg-base-100 shadow-xl  ">
-          <div className="card-body flex items-center  flex-col lg:flex-row  justify-between">
-            <div className="container mx-auto ">
+        <div className="bg-base-100 shadow-xl p-6 md:p-8 lg:p-10 rounded-lg">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="md:mr-8 ">
               <Icon icon="skill-icons:rocket" width="80" height="80" />
             </div>
-            <div className="col">
-              <h2 className="card-title text-2xl font-semibold  ">
+            <div className="flex flex-col">
+              <h2 className="text-4xl font-semibold mb-4 md:mb-0">
                 Nuevas características próximamente!
               </h2>
-              <p className="text-base text-gray-600">
-                This Autumn you'll get access to 1000s of videos, extra
-                wordlists, and speaking practice with an incredible AI language
-                partner.
+              <p className="text-base  mb-4 py-5">
+                Estamos trabajando en nuevas características para mejorar tu
+                experiencia de aprendizaje. Con ellas podrás practicar lo
+                aprendido en los cursos y reforzar tus conocimientos.
+                proximamente!
               </p>
-              <div className="card-actions justify-end mt-4">
-                <button className="btn btn-primary">Descubre más</button>
+              <div className="flex justify-end">
+                <button className=" btn bg-[#4BC7E7] text-white">
+                  Descubre más
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-3xl font-semibold mt-10 font-Lato">
+        <p className="text-3xl font-semibold mt-10 font-Lato py-8">
           Cursos matriculados
         </p>
 
         {userCourses.length === 0 ? (
           <p className="text-xl">Todavía no te has matriculado en un curso.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 xl:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6 lg:gap-10 xl:gap-12">
             {userCourses.map((course) => (
-              <div key={course.id} className="relative h-[400px]">
+              <div key={course.id} className="relative ">
                 <div className="card bg-base-100 shadow-xl p-6 relative">
                   <div className="flex items-center mb-4">
                     <div className="w-16 h-16 rounded-full overflow-hidden">
@@ -77,7 +80,7 @@ export const Home = () => {
                       />
                     </div>
                     <div className="ml-4">
-                      <h3 className="text-2xl font-semibold overflow-hidden overflow-ellipsis">
+                      <h3 className="text-5xl font-semibold overflow-hidden overflow-ellipsis">
                         {course.name}
                       </h3>
                       <p className="text-gray-600">{course.description}</p>
@@ -93,6 +96,9 @@ export const Home = () => {
                           <li key={unit.id}>{unit.name}</li>
                         ))}
                       </ul>
+                      <p className="text-green-500 mt-2">
+                        Progreso del curso: 70%
+                      </p>
                       <progress
                         className="progress progress-error w-full mt-4"
                         value="70"
@@ -122,12 +128,12 @@ export const Home = () => {
                     <dialog id="my_modal_3" className="modal">
                       <div className="modal-box">
                         <form method="dialog">
-                          {/* if there is a button in form, it will close the modal */}
                           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
                             ✕
                           </button>
                         </form>
                         <h3 className="font-bold text-lg">{course.name}</h3>
+
                         <div className="my-2 ">
                           <Link className="btn px-2 mx-2 " to={`/course/`}>
                             <Icon
@@ -139,7 +145,7 @@ export const Home = () => {
                             Tarjetas
                           </Link>
                           <div
-                            className="tooltip tooltip-open tooltip-top"
+                            className="tooltip tooltip-open tooltip-end"
                             data-tip="proximamente"
                           >
                             <button
