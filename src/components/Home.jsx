@@ -132,7 +132,8 @@ export const Home = () => {
                             ✕
                           </button>
                         </form>
-                        <h3 className="font-bold text-lg">{course.name}</h3>
+                        <h3 className="font-bold text-xl">{course.name}</h3>
+                        <p>Que vas a aprender hoy? </p>
 
                         <div className="my-2 ">
                           <Link className="btn px-2 mx-2 " to={`/course/`}>
@@ -145,7 +146,7 @@ export const Home = () => {
                             Tarjetas
                           </Link>
                           <div
-                            className="tooltip tooltip-open tooltip-end"
+                            className="tooltip tooltip-open tooltip-bottom"
                             data-tip="proximamente"
                           >
                             <button
@@ -163,7 +164,7 @@ export const Home = () => {
                             </button>
                           </div>
                           <div
-                            className="tooltip tooltip-open tooltip-top"
+                            className="tooltip tooltip-open tooltip-bottom "
                             data-tip="proximamente"
                           >
                             <button
