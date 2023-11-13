@@ -4,12 +4,13 @@ import { useCourse } from "../context/CourseContext";
 import { Nabvar } from "./Nabvar";
 import { Footer } from "./Footer";
 import { Icon } from "@iconify/react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export const Home = () => {
   const { user, loading } = useAuth();
-  const { getCoursesByUserId } = useCourse();
+  const { getCoursesByUserId, getUnitById } = useCourse();
   const [userCourses, setUserCourses] = useState([]);
+  const { courseId, unitId } = useParams();
 
   const notify = () => toast("Proximamente!");
 
@@ -27,6 +28,30 @@ export const Home = () => {
   }, [user, getCoursesByUserId]);
 
   if (loading) return <p>Cargando...</p>;
+
+  useEffect(() => {
+    const fetchUnit = async () => {
+      try {
+        // Utiliza el método getUnitById para obtener la unidad por su ID
+        const fetchedUnit = await getUnitById(courseId, unitId);
+
+        if (fetchedUnit) {
+          setUnit(fetchedUnit);
+          setFormData({
+            name: fetchedUnit.name,
+            description: fetchedUnit.description,
+            // Otros campos de la unidad...
+          });
+        } else {
+          console.error(`No se encontró ninguna unidad con el ID ${unitId}`);
+        }
+      } catch (error) {
+        console.error("Error al obtener la unidad:", error);
+      }
+    };
+
+    fetchUnit();
+  }, [courseId, unitId, getUnitById]);
 
   return (
     <>
@@ -136,7 +161,10 @@ export const Home = () => {
                         <p>Que vas a aprender hoy? </p>
 
                         <div className="my-2 ">
-                          <Link className="btn px-2 mx-2 " to={`/course/`}>
+                          <Link
+                            className="btn px-2 mx-2 "
+                            to={`/course/${course.id}/units/${course.units[0].id}/cards`}
+                          >
                             <Icon
                               icon="fluent:sticker-24-filled"
                               color="white"

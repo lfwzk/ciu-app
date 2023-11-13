@@ -89,11 +89,11 @@ export const Nabvar = () => {
             </Link>
           </div>
         </div>
-        <div className="navbar-center hidden lg:flex">
+        <div className="navbar-center hidden lg:flex text-2xl">
           <ul className="menu menu-horizontal px-1">
             <li>
               <Link to="/">
-                <FiHome className="mr-2" />
+                <FiHome className="mr-2 " />
                 Home
               </Link>
             </li>

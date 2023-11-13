@@ -35,8 +35,8 @@ function App() {
             element={<EditUnit />} // Reemplaza 'EditUnit' con el nombre de tu componente de edición de unidades
           />
           <Route
-            path="/course/:courseId/units/:unitId/supermemo"
-            element={<SuperMemo />} // Reemplaza 'SuperMemo' con el nombre de tu componente de repetición espaciada
+            path="/course/:courseId/units/:unitId/cards"
+            element={<SuperMemo />}
           />
         </Routes>
       </CourseProvider>
