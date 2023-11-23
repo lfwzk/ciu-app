@@ -4,13 +4,16 @@ import { useCourse } from "../context/CourseContext";
 import { Nabvar } from "./Nabvar";
 import { Footer } from "./Footer";
 import { Icon } from "@iconify/react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const Home = () => {
   const { user, loading } = useAuth();
+
   const { getCoursesByUserId, getUnitById } = useCourse();
+
   const [userCourses, setUserCourses] = useState([]);
-  const { courseId, unitId } = useParams();
+
+  const [unitId, setUnitId] = useState(null);
 
   const notify = () => toast("Proximamente!");
 
@@ -27,38 +30,27 @@ export const Home = () => {
     }
   }, [user, getCoursesByUserId]);
 
-  if (loading) return <p>Cargando...</p>;
+  // Función para manejar el clic en el botón del modal
+  const handleModalButtonClick = async (courseId, unitId) => {
+    try {
+      const unitData = await getUnitById(courseId, unitId);
 
-  useEffect(() => {
-    const fetchUnit = async () => {
-      try {
-        // Utiliza el método getUnitById para obtener la unidad por su ID
-        const fetchedUnit = await getUnitById(courseId, unitId);
-
-        if (fetchedUnit) {
-          setUnit(fetchedUnit);
-          setFormData({
-            name: fetchedUnit.name,
-            description: fetchedUnit.description,
-            // Otros campos de la unidad...
-          });
-        } else {
-          console.error(`No se encontró ninguna unidad con el ID ${unitId}`);
-        }
-      } catch (error) {
-        console.error("Error al obtener la unidad:", error);
+      if (unitData) {
+        setUnitId(unitData.id);
+        setIsModalOpen(true);
+      } else {
+        console.error(`No se encontró ninguna unidad con el ID ${unitId}`);
       }
-    };
-
-    fetchUnit();
-  }, [courseId, unitId, getUnitById]);
-
+    } catch (error) {
+      console.error("Error al manejar el clic en el botón del modal:", error);
+    }
+  };
   return (
     <>
       <Nabvar />
       <div className="min-h-screen bg-base-200 relative p-10">
         <p className="text-3xl font-semibold mb-10 font-Lato">
-          Bienvenid@ 🎉 {user.displayName || user.email}
+          Bienvenid@ {user.displayName || user.email} 🎉
         </p>
 
         <div className="bg-base-100 shadow-xl p-6 md:p-8 lg:p-10 rounded-lg">
@@ -77,8 +69,11 @@ export const Home = () => {
                 proximamente!
               </p>
               <div className="flex justify-end">
-                <button className=" btn bg-[#4BC7E7] text-white">
-                  Descubre más
+                <button>
+                  <a href="/news" className=" btn bg-[#4BC7E7] text-white">
+                    {" "}
+                    Descubre más
+                  </a>
                 </button>
               </div>
             </div>
@@ -162,8 +157,12 @@ export const Home = () => {
 
                         <div className="my-2 ">
                           <Link
-                            className="btn px-2 mx-2 "
-                            to={`/course/${course.id}/units/${course.units[0].id}/cards`}
+                            className="btn px-2 mx-2"
+                            to={`/course/${course.id}/units/${
+                              course.units && course.units.length > 0
+                                ? course.units[0].id
+                                : ""
+                            }/cards`}
                           >
                             <Icon
                               icon="fluent:sticker-24-filled"
@@ -173,6 +172,7 @@ export const Home = () => {
                             />
                             Tarjetas
                           </Link>
+
                           <div
                             className="tooltip tooltip-open tooltip-bottom"
                             data-tip="proximamente"

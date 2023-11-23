@@ -9,6 +9,7 @@ import { CourseProvider } from "./context/CourseContext";
 import { EditCourse } from "./views/EditCourse";
 import { EditUnit } from "./views/EditUnit";
 import { SuperMemo } from "./views/Supermemo";
+import { News } from "./components/News";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             path="/course/:courseId/units/:unitId/cards"
             element={<SuperMemo />}
           />
+          <Route path="/news" element={<News />} />
         </Routes>
       </CourseProvider>
     </AuthProvider>
