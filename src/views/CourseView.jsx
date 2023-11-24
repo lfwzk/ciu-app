@@ -169,7 +169,6 @@ export const CourseView = () => {
                         }
                       />
                       <span className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        {/* Puedes agregar un ícono de carga o algún otro indicador visual aquí */}
                         📷
                       </span>
                     </div>
@@ -205,9 +204,9 @@ export const CourseView = () => {
                 proximamente!
               </p>
               <div className="flex justify-end">
-                <button className=" btn bg-[#4BC7E7] text-white">
+                <a className=" btn bg-[#4BC7E7] text-white" href="/news">
                   Descubre más
-                </button>
+                </a>
               </div>
             </div>
           </div>
